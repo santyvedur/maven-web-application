@@ -98,14 +98,14 @@
 	
 	    <repository>
 	      <id>nexus</id>
-	      <name>Santosh Releases Nexus Repository</name>
-	      <url>http://3.235.171.83:8081/repository/walmart_snapshot_rept/</url>
+	      <name>Santosh Release Nexus Repository</name>
+	      <url>http://3.235.171.83:8081/repository/walmart_release_repo/</url>
 	    </repository>
 	    
 	    <snapshotRepository>
 	      <id>nexus</id>
-	      <name>Mithun Technologies Snapshot Nexus Repository </name>
-	      <url>http://3.235.171.83:8081/repository/walmart_release_repo/</url>
+	      <name>Santosh Snapshot Nexus Repository </name>
+	      <url>http://3.235.171.83:8081/repository/walmart_snapshot_rept/</url>
 	    </snapshotRepository>
 	    
 	</distributionManagement>
