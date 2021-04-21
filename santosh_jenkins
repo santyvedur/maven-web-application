@@ -1,0 +1,51 @@
+node
+{
+    
+echo "Jenkins Node Name ${env.NODE_NAME}"
+echo "Jenkins Home ${env.JENKINS_HOME}"
+echo "Jenkins URL ${env.JENKINS_URL}"
+echo "JOB Name ${env.JOB_NAME}"
+  
+def mavenTool = tool name: "maven3.6.3"
+properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '3', numToKeepStr: '5')), pipelineTriggers([githubPush()])])
+
+stage("CodeCheckout")
+{
+
+git branch: 'development', url: 'https://github.com/santyvedur/maven-web-application.git'
+
+}
+
+stage("CodeCleanandBuild")
+{
+sh "${mavenTool}/bin/mvn clean package"
+}
+
+stage("CodeAnalysis")
+{
+withSonarQubeEnv(credentialsId: 'Sonarqubenewauthtoken') {
+    sh "${mavenTool}/bin/mvn sonar:sonar"
+}
+}
+
+
+
+stage("Quality Gate"){
+  timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+    if (qg.status != 'OK') {
+      error "Pipeline aborted due to quality gate failure: ${qg.status}"
+    }
+	
+  }
+}
+stage("DeploytoNexus")
+{
+sh "${mavenTool}/bin/mvn deploy"
+}
+
+stage("DeploytoTomcat")
+{
+    deploy adapters: [tomcat9(credentialsId: 'tomcat_user_creds', path: '', url: 'http://3.86.13.108:8080/')], contextPath: null, war: '**/maven-web-application.war'
+}
+}
