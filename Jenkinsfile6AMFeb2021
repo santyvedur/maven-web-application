@@ -12,7 +12,7 @@ node('nodejsinstance')
   
   properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '3', daysToKeepStr: '', numToKeepStr: '3')), pipelineTriggers([pollSCM('* * * * * ')])])
   
- stage('CheckoutCode')
+ stage('Checkoutcode')
  {
   git branch: 'development', credentialsId: '05d44367-ae8e-4ef8-88f3-330b9e349310', url: 'https://github.com/MithunTechnologiesDevOps/maven-web-application.git'
  }
