@@ -22,7 +22,7 @@ node('nodejsinstance')
  sh "${mavenHome}/bin/mvn clean package"
  }
  /*
- stage('ExecuteSonarQubeReport')
+ stage('executeSonarQubeReport')
  {
  sh "${mavenHome}/bin/mvn sonar:sonar"
  }
