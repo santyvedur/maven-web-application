@@ -1,0 +1,78 @@
+pipeline{
+agent any
+
+tools{
+maven 'maven3.6.3'
+}
+
+options{
+//Add the timestamp to the console output
+timestamps()
+//Discard old buids
+buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '3', daysToKeepStr: '', numToKeepStr: '3'))
+}
+
+stages{
+
+stage('Checkoutcode'){
+steps{
+git branch: 'development', url: 'https://github.com/santyvedur/maven-web-application.git'
+
+}
+}
+
+stage('CodeCleanandBuild'){
+steps{
+sh 'mvn clean package'
+}
+}
+
+stage('SonarReview'){
+steps{
+    withSonarQubeEnv("SonarqubeServer"){
+sh 'mvn sonar:sonar'
+}
+}
+}
+
+stage('QualityGateCheck'){
+
+steps{
+    script{
+    timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+    def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+    if (qg.status != 'OK') {
+      error "Pipeline aborted due to quality gate failure: ${qg.status}"
+    }
+	else {
+	 print "SonarQube successfully completed the scan"
+	
+	}
+    
+}   
+    
+    } 
+}
+}
+
+
+stage('RemoteRepoDeploy'){
+steps{
+sh 'mvn deploy'
+}
+}
+
+
+
+stage('Deploywar to container'){
+
+steps{
+deploy adapters: [tomcat9(credentialsId: 'tomcat_user_creds', path: '', url: 'http://52.201.221.129:8080/')], contextPath: null, war: '**/maven-web-application.war'
+}
+
+}
+
+}
+
+}
+
