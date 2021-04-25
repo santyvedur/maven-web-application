@@ -46,6 +46,6 @@ sh "${mavenTool}/bin/mvn deploy"
 
 stage("DeploytoTomcat")
 {
-    deploy adapters: [tomcat9(credentialsId: 'tomcat_user_creds', path: '', url: 'http://3.86.13.108:8080/')], contextPath: null, war: '**/maven-web-application.war'
+    deploy adapters: [tomcat9(credentialsId: 'tomcat_user_creds', path: '', url: 'http://52.201.221.129:8080/')], contextPath: null, war: '**/maven-web-application.war'
 }
 }
